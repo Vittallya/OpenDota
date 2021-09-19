@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+
+
+<div id="replaceMe">
+    <div class="jumbotron text-center">
+        <p>@Ajax.ActionLink("Сформировать ссылку", "GenerateLink", new AjaxOptions() { UpdateTargetId = "linkPlace" })</p>
+    </div>
+
+    <div id="linkPlace" >
+    </div>
+
+       
+</div>

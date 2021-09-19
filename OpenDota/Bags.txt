@@ -1,0 +1,1 @@
+﻿1) Баг с двойным выозовом контроллера из AJAX -ссылки: https://stackoverflow.com/questions/6244411/ajax-actionlink-calling-controller-twice

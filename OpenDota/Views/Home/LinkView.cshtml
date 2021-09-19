@@ -1,0 +1,19 @@
+﻿@using OpenDota.Models;
+
+@model RoomModel
+
+<div class="jumbotron text-center">
+    <h3>@Model.Link</h3>
+    
+
+    @using(Html.BeginForm("JoinRoomCreator", "Home"))
+    {
+        <input type="hidden" name="Link" value="@Model.Link"/>
+        <input type="hidden" name="RoomId" value="@Model.RoomId"/>
+        <input type="submit" value="Перейти в комнату"/>
+    }
+
+    @*@Html.ActionLink("Перейти в комнату", "JoinRoom", new { Link = Model.Link, RoomId = Model.RoomId },
+     new { @class = "btn-default", id = "btn-link" })*@
+</div>
+

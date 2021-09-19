@@ -1,0 +1,50 @@
+﻿@using OpenDota.Models;
+@model RoomModel
+
+<style>
+    .centerBox {
+        display: flex
+    }
+
+    .textWait {
+        margin: auto
+    }
+
+    .link {
+        font-size: 25px;
+    }
+</style>
+
+
+
+@Ajax.ActionLink("Приоединение", "StartMatch", new { isCreator = Model.IsCreator, roomId = Model.RoomId },
+    new AjaxOptions { UpdateTargetId = "container", LoadingElementId = "preLoad" },
+    new { id = "connectLink", style = "display:none" })
+
+
+@Ajax.ActionLink("ожидание хода", "AwaitOpponent", new { isCreator = Model.IsCreator, roomId = Model.RoomId },
+    new AjaxOptions { UpdateTargetId = "container" },
+    new { id = "awaitLink", style = "display:none" })
+
+
+<div id="container">
+    <div id="preLoad">
+        <p><h3>Комната создана!</h3></p>
+        <p class="text-info link">@Model.Link</p>
+        <div class="centerBox">
+            <h3 class="textWait">Ожидание подключения соперника...</h3>
+            <img width="100" src="https://minecraft-pe.com/wp-content/themes/minecraft-pe/spinner.gif" />
+
+        </div>
+    </div>
+
+
+</div>
+
+@*<script>
+    $("#container").ready(() => {
+        $("#connectLink").click();
+    });
+</script>*@
+
+@Scripts.Render("~/scripts/RoomScript.js")

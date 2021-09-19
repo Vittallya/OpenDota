@@ -1,0 +1,9 @@
+﻿@using OpenDota.Models;
+@model RoomModel
+
+<h3>Выберите персонажа:</h3>
+
+
+
+@Ajax.ActionLink("Выбрать", "MakeStep", new { isCreator = Model.IsCreator, RoomId = Model.RoomId}, new AjaxOptions { UpdateTargetId = "container" })
+@*@Html.ActionLink("Выбрать 1", "MakeStep", new { roomId = Model.RoomId, isCreator = Model.IsCreator})*@

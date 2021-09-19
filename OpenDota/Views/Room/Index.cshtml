@@ -1,0 +1,59 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+
+
+    <script>
+        window.onbeforeunload = function (e) {
+            alert("sdfsf")
+
+
+            e.returnValue = 'onbeforeunload';
+            return 'onbeforeunload';
+        };
+
+        document.onbeforeunload = function (e) {
+            alert("sdfsf")
+
+
+            e.returnValue = 'onbeforeunload';
+            return 'onbeforeunload';
+        };
+
+        //window.onbeforeunload = confirmExit;
+        //function confirmExit() {
+        //    alert("confirm exit is being called");
+        //    return false;
+        //}
+    </script>
+
+</head>
+<body>
+    <div>
+        <p>This is the room!</p>
+    </div>
+
+    <script>
+        window.onbeforeunload = function (e) {
+            alert("sdfsf")
+            e.returnValue = 'onbeforeunload';
+            return 'onbeforeunload';
+        };
+        document.onbeforeunload = function (e) {
+            alert("sdfsf")
+
+
+            e.returnValue = 'onbeforeunload';
+            return 'onbeforeunload';
+        };
+    </script>
+</body>
+</html>

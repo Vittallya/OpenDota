@@ -19,5 +19,10 @@ namespace OpenDota.Models
         public string Link { get; set; }
         public int RoomId { get; set; }
         public bool IsCreator { get; set; }
+
+        public int HeroSelected { get; set; }
+
+        public bool IsBlocking { get; set; }
+        public Hero[] Heroes { get; set; }
     }
 }

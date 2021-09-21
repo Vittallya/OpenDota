@@ -1,0 +1,17 @@
+﻿@using OpenDota.Models;
+@model ResultModel
+
+@{
+    bool isNothing = Model.Result == 0;
+
+    string who = Model.Result > 0 ? "Игрок 1" : "Игрок 2";
+}
+
+@if (isNothing)
+{
+    <h2> Победа ожидается 50/50</h2>
+}
+else
+{
+    <h2>@who прогнозируемо победит</h2>
+}

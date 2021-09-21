@@ -53,6 +53,9 @@
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -106,9 +109,6 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="WebGrease">
       <Private>True</Private>
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
@@ -127,22 +127,22 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="Controllers\DotaApiController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\RoomController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\ActualHeroesModel.cs" />
     <Compile Include="Models\ApiContext.cs" />
+    <Compile Include="Models\Hero.cs" />
     <Compile Include="Models\Match.cs" />
-    <Compile Include="Models\Player.cs" />
-    <Compile Include="Models\Room.cs" />
+    <Compile Include="Models\Match2.cs" />
+    <Compile Include="Models\ResultModel.cs" />
     <Compile Include="Models\RoomModel.cs" />
     <Compile Include="Models\RoomService.cs" />
     <Compile Include="Models\RoomSession.cs" />
-    <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Prognozer.cs" />
     <Compile Include="Services\RoomService.cs" />
     <Compile Include="Models\UserModel.cs" />
   </ItemGroup>
@@ -184,12 +184,12 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Room\Index.cshtml" />
     <Content Include="Views\Home\LinkView.cshtml" />
     <Content Include="Views\Home\RoomView.cshtml" />
-    <Content Include="Views\Home\BlockingView.cshtml" />
     <Content Include="Views\Home\ChooseHeroView.cshtml" />
     <Content Include="Views\Home\ConnectionAwaitView.cshtml" />
+    <Content Include="Views\Home\ActualHeroes.cshtml" />
+    <Content Include="Views\Home\ResultView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

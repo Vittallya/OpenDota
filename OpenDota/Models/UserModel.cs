@@ -15,8 +15,9 @@ namespace OpenDota.Models
             IsCreator = isCreator;
         }
 
-        public ICollection<int> BannedHeroes { get; set; }
-        public ICollection<int> SelectedHeroes { get; set; }
+        public ICollection<int> BannedHeroes { get; set; } = new List<int>();
+        public ICollection<int> SelectedHeroes { get; set; } = new List<int>();
+
 
     }
 }

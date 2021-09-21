@@ -23,8 +23,13 @@
 
 
 @Ajax.ActionLink("ожидание хода", "AwaitOpponent", new { isCreator = Model.IsCreator, roomId = Model.RoomId },
-    new AjaxOptions { UpdateTargetId = "container" },
+    new AjaxOptions { UpdateTargetId = "container", OnSuccess = "RefreshHeroes" },
     new { id = "awaitLink", style = "display:none" })
+
+
+@Ajax.ActionLink("герои", "GetActualSelection", new { roomId = Model.RoomId },
+    new AjaxOptions { UpdateTargetId = "actualHeroesPlace", HttpMethod = "GET", InsertionMode = InsertionMode.Replace },
+    new { id = "actualHeroesLink", style = "display:none" })
 
 
 <div id="container">
@@ -40,6 +45,8 @@
 
 
 </div>
+
+<div id="actualHeroesPlace"></div>
 
 @*<script>
     $("#container").ready(() => {

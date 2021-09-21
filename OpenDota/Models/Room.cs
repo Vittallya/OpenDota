@@ -18,8 +18,5 @@ namespace OpenDota.Models
         public RoomStatus RoomStatus { get; set; }
     }
 
-    public enum RoomStatus
-    {
-        AwaitOnCreate, Active, Pause, Completed 
-    }
+    
 }

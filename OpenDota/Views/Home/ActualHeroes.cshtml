@@ -1,0 +1,48 @@
+﻿@using OpenDota.Models;
+@model ActualHeroesModel
+
+
+<div style="display:flex">
+    <h3>Игрок 1 выбрал:</h3>
+
+    <ul>
+
+        @foreach (var hero in Model.User1Heroes)
+        {
+            <li>@hero.localized_name</li>
+        }
+    </ul>
+
+    <h3>Игрок 1 заблокировал:</h3>
+
+    <ul>
+
+        @foreach (var hero in Model.User1Blocked)
+        {
+            <li style="color:orangered;">@hero.localized_name</li>
+        }
+    </ul>
+</div>
+
+<br />
+
+<div style="display:flex">
+
+    <h3>Игрок 2 выбрал:</h3>
+    <ul>
+
+        @foreach (var hero in Model.User2Heroes)
+        {
+            <li>@hero.localized_name</li>
+        }
+    </ul>
+    <h3>Игрок 2 заблокировал:</h3>
+
+    <ul>
+
+        @foreach (var hero in Model.User2Blocked)
+        {
+            <li style="color:orangered;">@hero.localized_name</li>
+        }
+    </ul>
+</div>

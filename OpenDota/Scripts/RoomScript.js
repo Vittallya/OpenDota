@@ -6,8 +6,12 @@
 
 $("#container").ready(() => {
     console.log("call")
-    $("#connectLink").click();    
+    $("#connectLink").click(); 
 });
+
+function RefreshHeroes() {
+    $("#actualHeroesLink").click(); 
+}
 
 function StartRefresh() {
     $("#awaitLink").click();  

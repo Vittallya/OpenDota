@@ -15,14 +15,14 @@ namespace OpenDota.Models
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Room>().Property(x => x.Id).
-                HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
-            modelBuilder.Entity<User>().Property(x => x.Id).
-                HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
+            //modelBuilder.Entity<Room>().Property(x => x.Id).
+            //    HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
+            //modelBuilder.Entity<User>().Property(x => x.Id).
+            //    HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
 
         }
 
-        public DbSet<Room> Rooms => Set<Room>();
-        public DbSet<User> Users => Set<User>();
+        //public DbSet<Room> Rooms => Set<Room>();
+        //public DbSet<User> Users => Set<User>();
     }
 }

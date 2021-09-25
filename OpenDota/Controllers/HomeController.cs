@@ -11,12 +11,16 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Newtonsoft.Json;
+using OpenDota.DAL;
+using System.Data.Entity;
 
 namespace OpenDota.Controllers
 {
     public class HomeController : Controller
     {
         static RoomService _roomService;
+
+        private RoomContext roomContext;
 
         public async Task<ActionResult> Index()
         {
@@ -98,12 +102,20 @@ namespace OpenDota.Controllers
         public async Task<ActionResult> SelectHero(RoomModel model)
         {
             var room = _roomService[model.RoomId];
+
+            if(room == null)
+            {
+                Response.StatusCode = 404;
+                return Content("Комната не найдена");
+            }
+
             room.SelectHero(model.IsCreator, model.HeroSelected);
 
             if (!room.CanChoose())
             {
-                int res = await GetResultForSession(room);
-                return PartialView("ResultView", new ResultModel { Result = res });
+                var res = await SaveResults(room);
+                //return PartialView("ResultView", new ResultModel { Result = res });
+                return RedirectToAction("ShowResult", new { roomId = room.Id, isShowLink = true });
             }
 
             model.IsBlocking = room.IsBanMode();
@@ -112,45 +124,61 @@ namespace OpenDota.Controllers
 
         }
 
-        public async Task<ActionResult> BanHero(RoomModel model)
+        public ActionResult BanHero(RoomModel model)
         {
             var room = _roomService[model.RoomId];
             room.BanHero(model.IsCreator, model.HeroSelected);
 
 
-            if (!room.CanChoose())
-            {
-                int res = await GetResultForSession(room);
-                return PartialView("ResultView", new ResultModel() { Result = res });
-            }
+            //if (!room.CanChoose())
+            //{
+            //    await GetResultForSession(room);
+            //    //return PartialView("ResultView", new ResultModel { Result = res });
+            //    return RedirectToAction("ShowResult", room.Id);
+            //}
             return PartialView("ConnectionAwaitView", model);
 
         }
 
-        private async Task<int> GetResultForSession(RoomSession room)
+
+        public async Task<ActionResult> AwaitOpponent(RoomModel model)
         {
-            int res = 0;
-            if(!room.IsResultSetted && !room.ResultCalled)
+            var room = _roomService[model.RoomId];
+
+            while (room.IsAwaitOpponent(model.IsCreator) || room.IsSavingProccesNow())
             {
-                room.ResultCalled = true;
-                res = await prognozer.GetResult(room[true].SelectedHeroes.ToArray(), room[false].SelectedHeroes.ToArray());
-                room.SetResult(res);
-            }
-            else if (room.ResultCalled && !room.IsResultSetted)
-            {
-                while(!room.IsResultSetted)
+                if (!Prognozer.IsLoaded)
+                {
+                    await Prognozer.LoadMatches();
+                }
+                else
                 {
                     await Task.Delay(200);
                 }
-                res = room.Result;
             }
-            else
-            {
-                res = room.Result;
-            }
-            return res;
-        }
 
+            if (room.IsResultSetted)
+            {
+                return RedirectToAction("ShowResult", new { roomId = room.Id, isShowLink = true });
+            }
+
+            //if (!room.CanChoose())
+            //{
+            //    int res = await SaveResults(room);
+
+            //    return PartialView("ResultView", new ResultModel() { Result = res });
+            //}
+
+            model.Heroes = room.GetHeroesFor(model.IsCreator);
+
+            model.IsBlocking = room.IsBanMode();
+            //проверить, можно ли пользователю выбрать еще кого-то
+            //-да: переход в режим ожидания, пердставление ожидания
+            //-нет: переход в финальную страницу
+
+
+            return PartialView("ChooseHeroView", model);
+        }
         public ActionResult GetActualSelection(int roomId)
         {
             var room = _roomService[roomId];
@@ -170,47 +198,116 @@ namespace OpenDota.Controllers
 
         }
 
-        public ActionResult GetStep(RoomModel model)
-        {
-            return PartialView("ChooseHeroView", model);
-        }
+        //public ActionResult GetStep(RoomModel model)
+        //{
+        //    return PartialView("ChooseHeroView", model);
+        //}
 
         private Prognozer prognozer = new Prognozer();
 
-        public async Task<ActionResult> AwaitOpponent(RoomModel model)
+        [HttpGet]
+        public async Task<ActionResult> ShowResult(int roomId, bool? isShowLink)
         {
-            var room = _roomService[model.RoomId];
-
-            while (room.IsAwaitOpponent(model.IsCreator))
+            using(var context = new RoomContext())
             {
-                if (!Prognozer.IsLoaded)
+                await context.RoomResult.LoadAsync();
+
+                var room = context.RoomResult.Find(roomId);
+                if(room == null)
                 {
-                    await Prognozer.LoadMatches();
+                    Response.StatusCode = 404;
+                    return Content("Данная комната не найдена");
                 }
-                else
+
+                string link = null;
+
+                if(isShowLink.HasValue && isShowLink.Value)
                 {
-                    await Task.Delay(200);
+                    link = "https://" + HttpContext.Request.Url.Authority + Url.Action(nameof(ShowResult), new { roomId = roomId });
                 }
+
+
+                return View("ResultView", new ResultModel
+                {
+                    RoomId = room.RoomId,
+                    Link = link,
+                    CreatorsHeroes = room.CreatorHeroes.Select(x => x.Name).ToArray(),
+                    OpponentHeroes = room.OppHeroes.Select(x => x.Name).ToArray(),
+                    Result = room.Result,
+                    Comment = room.Comment,
+                });
             }
-
-            if (!room.CanChoose())
-            {
-                int res = await GetResultForSession(room);
-
-                return PartialView("ResultView", new ResultModel() { Result = res });
-            }
-
-            model.Heroes = room.GetHeroesFor(model.IsCreator);
-
-            model.IsBlocking = room.IsBanMode();
-            //проверить, можно ли пользователю выбрать еще кого-то
-            //-да: переход в режим ожидания, пердставление ожидания
-            //-нет: переход в финальную страницу
-
-
-            return PartialView("ChooseHeroView", model);
         }
 
+        [HttpPost]
+        public async Task<ActionResult> ShowResult(ResultModel model)
+        {
+            using (var db = new RoomContext())
+            {
+                var room = await db.RoomResult.FindAsync(model.RoomId);
+                room.Comment = model.Comment;
+                await db.SaveChangesAsync();
+            }
+
+            return Content("<h2>"+ model.Comment+"</h2>");
+        }
+
+
+        string error;
+
+        private async Task<RoomResult> SaveResults(RoomSession room)
+        {
+            room.ResultCalled = true;
+            int res = await prognozer.GetResult(room[true].SelectedHeroes.ToArray(), room[false].SelectedHeroes.ToArray());
+            room.SetResult(res);
+            var roomRes = GetRoomRes(room);
+            await SaveRoomRes(roomRes);
+            room.CompleteCompetition();
+
+            return roomRes;
+        }
+        private RoomResult GetRoomRes(RoomSession room)
+        {
+            var creator = room[true];
+            var opp = room[false];
+
+            var creatorHeroes = creator.SelectedHeroes.
+                Select(x => _roomService.AllHeroes.FirstOrDefault(y => y.id == x)).
+                Select(x => new HeroResult { HeroId = x.id, Name = x.localized_name, ChoosenByCreator = true, RoomResultId = room.Id }).
+                ToArray();
+
+            var oppHeroes = opp.SelectedHeroes.
+                Select(x => _roomService.AllHeroes.FirstOrDefault(y => y.id == x)).
+                Select(x => new HeroResult { HeroId = x.id, Name = x.localized_name, RoomResultId = room.Id }).
+                ToArray();
+
+            var roomRes = new RoomResult
+            {
+                CreatorHeroes = creatorHeroes,
+                OppHeroes = oppHeroes,
+                Result = room.Result,
+                RoomId = room.Id,
+            };
+            return roomRes;
+        }
+        private async Task<bool> SaveRoomRes(RoomResult roomResult)
+        {
+            try
+            {
+                using (var db = new RoomContext())
+                {
+                    db.RoomResult.Add(roomResult);
+                    await db.SaveChangesAsync();
+                }
+                return true;
+            }
+            catch(Exception e)
+            {
+                error = e.Message;
+                return false;
+            }
+
+        }
         //public async Task<ActionResult> NextStep(RoomModel model)
         //{
         //    TestClass.Steps++;

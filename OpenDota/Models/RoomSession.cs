@@ -115,6 +115,11 @@ namespace OpenDota.Models
             return TotalSteps <= 4 || (TotalSteps >= 9 && TotalSteps < 15) || (TotalSteps >= 19 && TotalSteps < 23);
         }
 
+        public bool IsSavingProccesNow()
+        {
+            return ResultCalled && !IsResultSetted;
+        }
+
         public RoomSession(int id, RoomService roomService)
         {
             Id = id;
@@ -142,10 +147,10 @@ namespace OpenDota.Models
         public bool IsResultSetted { get; private set; }
         public bool ResultCalled { get; internal set; }
 
-        internal void SetResult(int res)
+        internal void CompleteCompetition()
         {
             IsResultSetted = true;
-            Result = res;
+            RoomStatus = RoomStatus.Completed;
         }
 
         public UserModel this[bool isCreator]
@@ -156,6 +161,11 @@ namespace OpenDota.Models
         public UserModel GetUser(bool isCreator)
         {
             return Users.First(x => x.IsCreator == isCreator);
+        }
+
+        internal void SetResult(int res)
+        {
+            Result = res;
         }
     }
     public enum RoomStatus

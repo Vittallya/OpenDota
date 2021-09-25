@@ -15,3 +15,67 @@ else
 {
     <h2>@who прогнозируемо победит</h2>
 }
+
+
+@if (Model.Link != null)
+{
+
+    <h2>Ссылка на результат: @Model.Link</h2>
+}
+
+<table>
+    <thead>
+        <tr>
+            <td>
+                Игрок 1 Выбрал:
+            </td>
+            <td>
+                Игрок 2 Выбрал:
+            </td>
+        </tr>
+    </thead>
+
+    <tbody>
+        @for (int i = 0; i < Model.CreatorsHeroes.Length; i++)
+        {
+            var creatorsHero = Model.CreatorsHeroes[i];
+            var oppHero = Model.OpponentHeroes[i];
+            <tr>
+                <td>@creatorsHero</td>
+                <td>@oppHero</td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+<div style="margin-top:20px">
+
+
+        @if (Model.Comment == null)
+        {
+
+            <div id="comment">
+
+                @using (Ajax.BeginForm("ShowResult", new AjaxOptions { UpdateTargetId = "comment", HttpMethod = "Post" }))
+                {
+
+                    <h4>Оставьте комментарий</h4>
+                    <input type="text" name="Comment" />
+                    <input type="hidden" name="RoomId" value="@Model.RoomId" />
+                    <input type="submit" value="Оставить комментарий" />
+                }
+            </div>
+
+
+
+        }
+        else
+        {
+
+            @Html.Label("Комментарий: ");
+            @Html.DisplayFor(x => x.Comment);
+        }
+
+    
+</div>

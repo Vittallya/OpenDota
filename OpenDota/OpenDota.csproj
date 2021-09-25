@@ -128,12 +128,18 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="DAL\HeroResult.cs" />
+    <Compile Include="DAL\RoomContext.cs" />
+    <Compile Include="DAL\RoomResult.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202109251838512_init.cs" />
+    <Compile Include="Migrations\202109251838512_init.designer.cs">
+      <DependentUpon>202109251838512_init.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActualHeroesModel.cs" />
-    <Compile Include="Models\ApiContext.cs" />
     <Compile Include="Models\Hero.cs" />
     <Compile Include="Models\Match.cs" />
     <Compile Include="Models\Match2.cs" />
@@ -206,6 +212,11 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.4.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202109251838512_init.resx">
+      <DependentUpon>202109251838512_init.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

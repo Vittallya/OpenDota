@@ -27,7 +27,7 @@
 
                     @Ajax.ActionLink(
                    display, action, new { isCreator = Model.IsCreator, RoomId = Model.RoomId, HeroSelected = hero.id },
-                   new AjaxOptions { UpdateTargetId = "container", OnSuccess = "RefreshHeroes" },
+                   new AjaxOptions { UpdateTargetId = "container", OnSuccess = "RefreshHeroes", HttpMethod = "GET" },
                    new { id = "heroSelectLink" })
                 </td>
             </tr>

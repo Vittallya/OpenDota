@@ -5,14 +5,14 @@
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<OpenDota.Models.ApiContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<OpenDota.DAL.RoomContext>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
         }
 
-        protected override void Seed(OpenDota.Models.ApiContext context)
+        protected override void Seed(OpenDota.DAL.RoomContext context)
         {
             //  This method will be called after migrating to the latest version.
 

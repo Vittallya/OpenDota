@@ -56,9 +56,14 @@ namespace OpenDota.Models
         /// </summary>
         /// <param name="isCreator"></param>
         /// <returns></returns>
-        public Hero[] GetAllHeroesFor(bool isCreator)
+        public Hero[] GetAllHeroesSelected(bool isCreator)
         {
             return this[isCreator].SelectedHeroes.Select(x => roomService.AllHeroes.First(y => y.id == x)).ToArray();
+        }
+        public string Link { get; private set; }
+        internal void SetupLink(string link)
+        {
+            Link = link;
         }
 
         /// <summary>
@@ -72,6 +77,11 @@ namespace OpenDota.Models
         }
 
         private readonly RoomService roomService;
+
+        internal void UserUnloaded(bool isCreator)
+        {
+            RoomStatus = RoomStatus.Pause;
+        }
 
         /// <summary>
         /// Те герои, которых может выбрать польз. на след. ходу
@@ -102,7 +112,7 @@ namespace OpenDota.Models
                 return !isCreator;
 
 
-            return isCreator && TotalSteps % 2 == 0 || !isCreator && TotalSteps % 2 != 0;
+            return !IsResultSaved && (isCreator && TotalSteps % 2 == 0 || !isCreator && TotalSteps % 2 != 0);
         }
 
 
@@ -117,7 +127,7 @@ namespace OpenDota.Models
 
         public bool IsSavingProccesNow()
         {
-            return ResultCalled && !IsResultSetted;
+            return ResultCalled && !IsResultSaved;
         }
 
         public RoomSession(int id, RoomService roomService)
@@ -137,19 +147,22 @@ namespace OpenDota.Models
         /// <param name="isCreator"></param>
         public void JoinUser(bool isCreator)
         {
-            Users.Add(new UserModel(isCreator));
+            if(RoomStatus == RoomStatus.AwaitOnCreate)
+            {
+                Users.Add(new UserModel(isCreator));;
+            }
 
             if (Users.Count == 2)
                 RoomStatus = RoomStatus.Active;
         }
 
         public int Result { get; private set; }
-        public bool IsResultSetted { get; private set; }
+        public bool IsResultSaved { get; private set; }
         public bool ResultCalled { get; internal set; }
 
         internal void CompleteCompetition()
         {
-            IsResultSetted = true;
+            IsResultSaved = true;
             RoomStatus = RoomStatus.Completed;
         }
 

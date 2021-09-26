@@ -20,7 +20,6 @@ namespace OpenDota.Controllers
     {
         static RoomService _roomService;
 
-        private RoomContext roomContext;
 
         public async Task<ActionResult> Index()
         {
@@ -45,29 +44,42 @@ namespace OpenDota.Controllers
         [HttpGet]
         public ActionResult GenerateLink()
         {
-            if (_roomService == null)
-                _roomService = new RoomService();
+            var room = _roomService.CreateRoom();
+            string link = "https://" + HttpContext.Request.Url.Authority + Url.Action(nameof(JoinRoom), new { RoomId = room.Id });// "/Room/Index?roomId=" + roomId;
+            room.SetupLink(link);
 
-            int roomId = _roomService.CreateRoom();
-            string link = "https://" + HttpContext.Request.Url.Authority + Url.Action(nameof(JoinRoom), new { RoomId = roomId });// "/Room/Index?roomId=" + roomId;
 
-            return PartialView("LinkView", new RoomModel(link, roomId));
-        }
-
-        public ActionResult LinkView()
-        {
-            return RedirectToAction("Index");
-        }
-
-        public ActionResult JoinRoomCreator(RoomModel model)
-        {
-            model.IsCreator = true;
-            return RedirectToAction("JoinRoom", model);
+            return PartialView("LinkView", new RoomModel(link, room.Id));
         }
 
         public ActionResult JoinRoom(RoomModel model)
         {
+            var room = _roomService[model.RoomId];
+
+            if(room != null)
+            {
+                model.Link = room.Link;
+
+                if(room.RoomStatus == RoomStatus.Pause)
+                {
+                    room.JoinUser(model.IsCreator);
+
+                    //model.Heroes = room.GetHeroesFor(model.IsCreator);
+                    //model.IsBlocking = room.IsBanMode();
+                    //model.IsReturn = true;
+
+
+                    return View("RoomView", model);
+                }
+                else if(room.RoomStatus == RoomStatus.Completed)
+                {
+                    return RedirectToAction("ShowResult", new { roomId = model.RoomId });
+                }
+
+            }
+
             var res = _roomService.ConnectToRoom(model.RoomId, model.IsCreator);
+
 
             if (!res.IsOk)
             {
@@ -78,28 +90,37 @@ namespace OpenDota.Controllers
             return View("RoomView", model);
         }
 
+        [HttpPost]
+        public void OnUserUnload(RoomModel model)
+        {
+            var room = _roomService[model.RoomId];
+            if(room != null)
+            {
+                room.UserUnloaded(model.IsCreator);
+            }
+
+        }
+
+
         public async Task<ActionResult> StartMatch(RoomModel model)
         {
             var room = _roomService[model.RoomId];
-
-
-
-            while (room.RoomStatus != RoomStatus.Active)
+            
+            while (room.RoomStatus == RoomStatus.AwaitOnCreate || room.RoomStatus == RoomStatus.Pause)
             {
                 await Task.Delay(200);                
             }
 
-            model.Heroes = _roomService.AllHeroes;
-            model.IsBlocking = true;
+            model.IsBlocking = room.IsBanMode();
 
-            if (model.IsCreator)
+            if (room.IsAwaitOpponent(model.IsCreator))
             {
-                return PartialView("ChooseHeroView", model);
+                return PartialView("ConnectionAwaitView", model);
             }
-
-            return PartialView("ConnectionAwaitView", model);
+            model.Heroes = room.GetHeroesFor(model.IsCreator);
+            return PartialView("ChooseHeroView", model);
         }
-        public async Task<ActionResult> SelectHero(RoomModel model)
+        public ActionResult SelectHero(RoomModel model)
         {
             var room = _roomService[model.RoomId];
 
@@ -109,33 +130,14 @@ namespace OpenDota.Controllers
                 return Content("Комната не найдена");
             }
 
-            room.SelectHero(model.IsCreator, model.HeroSelected);
 
-            if (!room.CanChoose())
-            {
-                var res = await SaveResults(room);
-                //return PartialView("ResultView", new ResultModel { Result = res });
-                return RedirectToAction("ShowResult", new { roomId = room.Id, isShowLink = true });
-            }
+            if (!model.IsBlocking)
+                room.SelectHero(model.IsCreator, model.HeroSelected);
+            else
+                room.BanHero(model.IsCreator, model.HeroSelected);
 
             model.IsBlocking = room.IsBanMode();
 
-            return PartialView("ConnectionAwaitView", model);
-
-        }
-
-        public ActionResult BanHero(RoomModel model)
-        {
-            var room = _roomService[model.RoomId];
-            room.BanHero(model.IsCreator, model.HeroSelected);
-
-
-            //if (!room.CanChoose())
-            //{
-            //    await GetResultForSession(room);
-            //    //return PartialView("ResultView", new ResultModel { Result = res });
-            //    return RedirectToAction("ShowResult", room.Id);
-            //}
             return PartialView("ConnectionAwaitView", model);
 
         }
@@ -157,17 +159,15 @@ namespace OpenDota.Controllers
                 }
             }
 
-            if (room.IsResultSetted)
+            if (!room.CanChoose())
             {
+                if (!room.IsResultSaved)
+                {
+                    await SaveResults(room);
+                }
+
                 return RedirectToAction("ShowResult", new { roomId = room.Id, isShowLink = true });
             }
-
-            //if (!room.CanChoose())
-            //{
-            //    int res = await SaveResults(room);
-
-            //    return PartialView("ResultView", new ResultModel() { Result = res });
-            //}
 
             model.Heroes = room.GetHeroesFor(model.IsCreator);
 
@@ -183,25 +183,20 @@ namespace OpenDota.Controllers
         {
             var room = _roomService[roomId];
 
-            if(room.RoomStatus == RoomStatus.AwaitOnCreate)
+            if(room.RoomStatus == RoomStatus.AwaitOnCreate || room.RoomStatus == RoomStatus.Pause)
             {
                 return null;
             }
 
             return PartialView("ActualHeroes", new ActualHeroesModel
             {
-                User1Heroes = room.GetAllHeroesFor(true),
-                User2Heroes = room.GetAllHeroesFor(false),
+                User1Heroes = room.GetAllHeroesSelected(true),
+                User2Heroes = room.GetAllHeroesSelected(false),
                 User1Blocked = room.GetAllHeroesBlocked(true),
                 User2Blocked = room.GetAllHeroesBlocked(false)
             });
 
         }
-
-        //public ActionResult GetStep(RoomModel model)
-        //{
-        //    return PartialView("ChooseHeroView", model);
-        //}
 
         private Prognozer prognozer = new Prognozer();
 
@@ -249,7 +244,7 @@ namespace OpenDota.Controllers
                 await db.SaveChangesAsync();
             }
 
-            return Content("<h2>"+ model.Comment+"</h2>");
+            return Content("<h3>"+ model.Comment+"</h3>");
         }
 
 

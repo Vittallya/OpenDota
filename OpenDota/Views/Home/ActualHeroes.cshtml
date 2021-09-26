@@ -2,47 +2,66 @@
 @model ActualHeroesModel
 
 
-<div style="display:flex">
-    <h3>Игрок 1 выбрал:</h3>
+<div>
 
-    <ul>
+    @if (Model.User1Heroes != null && Model.User1Heroes.Length > 0)
+    {
 
-        @foreach (var hero in Model.User1Heroes)
-        {
-            <li>@hero.localized_name</li>
-        }
-    </ul>
+        <h3>Игрок 1 выбрал:</h3>
 
-    <h3>Игрок 1 заблокировал:</h3>
+        <ul>
 
-    <ul>
+            @foreach (var hero in Model.User1Heroes)
+            {
+                <li>@hero.localized_name</li>
+            }
+        </ul>
+    }
 
-        @foreach (var hero in Model.User1Blocked)
-        {
-            <li style="color:orangered;">@hero.localized_name</li>
-        }
-    </ul>
+    @if (Model.User1Blocked != null && Model.User1Blocked.Length > 0)
+    {
+        <h3>Игрок 1 заблокировал:</h3>
+
+        <ul>
+
+            @foreach (var hero in Model.User1Blocked)
+            {
+                <li style="color:orangered;">@hero.localized_name</li>
+            }
+        </ul>
+    }
 </div>
 
 <br />
 
-<div style="display:flex">
+<div style="margin-left:20px">
 
-    <h3>Игрок 2 выбрал:</h3>
-    <ul>
+    @if (Model.User2Heroes != null && Model.User2Heroes.Length > 0)
+    {
+        <h3>Игрок 2 выбрал:</h3>
+        <ul>
 
-        @foreach (var hero in Model.User2Heroes)
-        {
-            <li>@hero.localized_name</li>
-        }
-    </ul>
-    <h3>Игрок 2 заблокировал:</h3>
+            @foreach (var hero in Model.User2Heroes)
+            {
+                <li>@hero.localized_name</li>
+            }
+        </ul>
 
-    <ul>
+    }
 
-        @foreach (var hero in Model.User2Blocked)
-        {
-            <li style="color:orangered;">@hero.localized_name</li>
-        }
-    </ul>
+    @if (Model.User2Blocked != null && Model.User2Blocked.Length > 0)
+    {
+        <h3>Игрок 2 заблокировал:</h3>
+
+        <ul>
+
+            @foreach (var hero in Model.User2Blocked)
+            {
+                <li style="color:orangered;">@hero.localized_name</li>
+            }
+        </ul>
+
+    }
+
+
 </div>

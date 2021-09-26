@@ -35,7 +35,10 @@
 <div id="container">
     <div id="preLoad">
         <p><h3>Комната создана!</h3></p>
-        <p class="text-info link">@Model.Link</p>
+        @if (Model.IsCreator)
+        {
+            <p class="text-info link">@Model.Link</p>
+        }
         <div class="centerBox">
             <h3 class="textWait">Ожидание подключения соперника...</h3>
             <img width="100" src="https://minecraft-pe.com/wp-content/themes/minecraft-pe/spinner.gif" />
@@ -46,7 +49,7 @@
 
 </div>
 
-<div id="actualHeroesPlace"></div>
+<div id="actualHeroesPlace" style="display:flex"></div>
 
 @*<script>
     $("#container").ready(() => {

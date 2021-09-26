@@ -88,9 +88,7 @@ namespace OpenDota.Services
                 }
             }
 
-            var skill = count;
-
-            return skill;
+            return count;
         }
 
         public static bool IsLoaded => matches2 != null;

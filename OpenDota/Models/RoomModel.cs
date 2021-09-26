@@ -22,6 +22,8 @@ namespace OpenDota.Models
 
         public int HeroSelected { get; set; }
 
+        public bool IsReturn { get; set; }
+
         public bool IsBlocking { get; set; }
         public Hero[] Heroes { get; set; }
     }

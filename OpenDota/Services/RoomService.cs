@@ -20,7 +20,7 @@ namespace OpenDota.Services
         }
         private List<int> _rooms = new List<int>();
 
-        public int CreateRoom()
+        public RoomSession CreateRoom()
         {
             Random rand = new Random();
             int roomId;
@@ -31,9 +31,11 @@ namespace OpenDota.Services
             while (_rooms.Contains(roomId));
 
             _rooms.Add(roomId);
-            Sessions.Add(new RoomSession(roomId, this));
+            var session = new RoomSession(roomId, this);
 
-            return roomId;
+            Sessions.Add(session);
+
+            return session;
         }
 
 
@@ -43,7 +45,7 @@ namespace OpenDota.Services
             {
                 var session = this[roomId];
 
-                if (session.RoomStatus == RoomStatus.AwaitOnCreate)
+                if (session.RoomStatus == RoomStatus.AwaitOnCreate || session.RoomStatus == RoomStatus.Pause)
                 {
                     session.JoinUser(isCreator);
                     return new ConnectToRoomResult(ConnectToRoomResultType.Ok, null);

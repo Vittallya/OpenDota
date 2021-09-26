@@ -18,6 +18,5 @@ namespace OpenDota.Models
         public ICollection<int> BannedHeroes { get; set; } = new List<int>();
         public ICollection<int> SelectedHeroes { get; set; } = new List<int>();
 
-
     }
 }

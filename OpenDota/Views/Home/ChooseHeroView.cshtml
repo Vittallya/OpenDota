@@ -3,7 +3,6 @@
 
 @{
     string display = Model.IsBlocking ? "Заблокировать персонажа" : "Выбрать персонажа";
-    string action = Model.IsBlocking ? "BanHero" : "SelectHero";
 }
 
 <h3>Выберите персонажа:</h3>
@@ -22,11 +21,11 @@
         {
             <tr>
                 <td>@hero.id</td>
-                <td>@hero.name</td>
+                <td>@hero.localized_name</td>
                 <td>
 
                     @Ajax.ActionLink(
-                   display, action, new { isCreator = Model.IsCreator, RoomId = Model.RoomId, HeroSelected = hero.id },
+                   display, "SelectHero", new { isCreator = Model.IsCreator, IsBlocking = Model.IsBlocking, RoomId = Model.RoomId, HeroSelected = hero.id },
                    new AjaxOptions { UpdateTargetId = "container", OnSuccess = "RefreshHeroes", HttpMethod = "GET" },
                    new { id = "heroSelectLink" })
                 </td>
